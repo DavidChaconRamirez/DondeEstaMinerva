@@ -14,12 +14,15 @@ from discord.ext import commands
 from googletrans import Translator
 import re
 
-# Configura el bot de Discord
+# Configuración del bot
+intents = discord.Intents.default()
+intents.messages = True  # Habilitar intent de mensajes
+intents.message_content = True  # Asegúrate de habilitar este intent
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+
 TOKEN = os.getenv('DISCORD_TOKEN')  # Usar variable de entorno
 CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')  # Usar variable de entorno
-intents = discord.Intents.default()
-intents.messages = True
-bot = commands.Bot(command_prefix='!', intents=intents)
 
 async def send_to_discord(location, time_left, image_url, items):
     channel = bot.get_channel(int(CHANNEL_ID))
