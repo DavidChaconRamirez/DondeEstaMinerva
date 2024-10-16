@@ -99,11 +99,12 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
 
 def scrape_minerva():
     options = Options()
-    options.add_argument('--headless')  # Ejecutar en modo sin cabeza
-    options.add_argument('--no-sandbox')  # Para evitar problemas de permisos
-    options.add_argument('--disable-dev-shm-usage')  # Manejo de memoria
-    options.add_argument('--disable-gpu')  # Deshabilitar GPU si es necesario
-    options.add_argument('--window-size=1920,1080')  # Tamaño de ventana
+    options.add_argument("--headless")  # Ejecución en modo headless
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    # Especificar la ruta de Chrome manualmente si es necesario
+    options.binary_location = "/usr/bin/google-chrome"  # Ruta donde Google Chrome está instalado en tu contenedor
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
