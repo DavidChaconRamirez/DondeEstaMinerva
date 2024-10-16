@@ -29,17 +29,7 @@ async def send_to_discord(location, time_left, image_url, items):
     # Procesa la ubicación traducida
     location_part = translated_location.text.split("en ", 1)[0].strip()
     
-    # Si se detecta que hay dos partes después de hacer split
-    if len(split_text) > 1:
-        location_part = split_text[0].strip()  # Parte que se traduce (antes de "en")
-        place = location.split(" at ")[-1].strip()  # Parte original de la ubicación
-    else:
-        # Si no hay un "en", usamos la traducción completa
-        location_part = translated_location.text
-        place = ""
-
-    if location_part.startswith("Ella"):
-        location_part = location_part.replace("Ella", "").strip()
+    place = location.split(" at ")[-1].strip() if " at " in location else ""
 
     # Si el lugar contiene un " in" al final, lo eliminamos
     if place.endswith(" in"):
