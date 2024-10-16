@@ -2,12 +2,16 @@ import discord
 from discord.ext import commands
 import os
 
+# Define los intents que quieres utilizar
+intents = discord.Intents.default()
+intents.messages = True  # Permite recibir eventos de mensajes
+
 # Obtiene el token y el ID del canal desde las variables de entorno
 TOKEN = os.environ.get('DISCORD_TOKEN')  # Reemplaza 'DISCORD_TOKEN' con el nombre de la variable de entorno que configures en Railway
 CHANNEL_ID = int(os.environ.get('DISCORD_CHANNEL_ID'))  # Reemplaza 'DISCORD_CHANNEL_ID' con el nombre de la variable de entorno que configures en Railway
 
-# Configura el prefijo de comandos
-bot = commands.Bot(command_prefix='!')
+# Configura el prefijo de comandos y los intents
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
