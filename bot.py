@@ -28,13 +28,19 @@ async def send_to_discord(location, time_left, image_url, items):
 
     # Procesa la ubicación traducida
     location_part = translated_location.text.split("en ", 1)[0].strip()
-    place = location.split(" at ")[-1].strip() if " at " in location else ""
+    # Ajuste aquí: extraer solo la palabra siguiente a "in"
+    if "in" in location:
+        parts = location.split("in")
+        if len(parts) > 1:
+            place = parts[1].strip().split()[0]  # Tomar solo la primera palabra después de "in"
+        else:
+            place = ""
+    else:
+        place = ""
+
 
     if location_part.startswith("Ella"):
         location_part = location_part.replace("Ella", "").strip()
-
-    if place.endswith(" in"):
-        place = place[:-2].strip()
 
     final_message = f"¡Hola! @Minerva {location_part} en {place}"
     location_message = await channel.send(final_message)
