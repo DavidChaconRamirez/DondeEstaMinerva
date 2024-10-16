@@ -39,7 +39,7 @@ async def send_to_discord(location, time_left, image_url, items):
     if place.endswith(" for"):
         place = place[:-3].strip()
 
-    final_message = f"¡Hola! @Minerva {location_part} en {place}"
+    final_message = f"¡Hola! <@{MINERVA_USER_ID}> {location_part} en {place}"
     location_message = await channel.send(final_message)
     sent_messages.append(location_message)
 
