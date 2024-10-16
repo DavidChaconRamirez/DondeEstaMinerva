@@ -81,25 +81,29 @@ async def send_to_discord(location, time_left, image_url, items):
     await countdown(channel, time_left, countdown_message, sent_messages)
 
 async def countdown(channel, time_left, countdown_message, sent_messages):
+    # Calculamos el tiempo de finalización
+    end_time = time.time() + time_left
+
     while time_left > 0:
-        # Calcular días, horas, minutos y segundos
+        # Calcular el tiempo restante de manera precisa
+        current_time = time.time()
+        time_left = max(0, end_time - current_time)
+
+        # Calcular días, horas, minutos y segundos restantes
         days, remainder = divmod(time_left, 86400)  # 86400 segundos en un día
         hours, remainder = divmod(remainder, 3600)
         minutes, seconds = divmod(remainder, 60)
 
         # Formatear el tiempo
-        time_string = f"{days:02}d {hours:02}h {minutes:02}m {seconds:02}s"
+        time_string = f"{int(days):02}d {int(hours):02}h {int(minutes):02}m {int(seconds):02}s"
         
         # Actualizar el mensaje de tiempo restante
         await countdown_message.edit(content=f"**Tiempo restante:** {time_string}**")
         
-        # Esperar un segundo
-        await asyncio.sleep(1)
-        
-        # Disminuir el tiempo
-        time_left -= 1
-        
-    # Eliminar todos los mensajes enviados
+        # Esperar 1 segundo antes de actualizar nuevamente
+        await asyncio.sleep(0.1)
+
+    # Eliminar todos los mensajes enviados cuando termine el conteo
     for message in sent_messages:
         await message.delete()
 
