@@ -13,7 +13,7 @@ from selenium.webdriver.chrome.options import Options
 import discord
 from discord.ext import commands
 from googletrans import Translator
-from playwright.sync_api import sync_playwright
+from playwright.async_api import async_playwright
 import re
 
 # Configuración del bot
@@ -98,19 +98,45 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
     for message in sent_messages:
         await message.delete()
 
-def scrape_minerva():
-     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        page.goto("URL_DE_LA_PAGINA")
-        
-        location = page.query_selector("SELECTOR_DE_LA_UBICACION").inner_text()
-        time_left = page.query_selector("SELECTOR_DEL_TIEMPO").inner_text()
-        image_url = page.query_selector("SELECTOR_DE_LA_IMAGEN").get_attribute("src")
-        items = page.query_selector("SELECTOR_DE_ITEMS").inner_text()
+async def scrape_minerva():
+    async with async_playwright() as p:
+        # Configurar el navegador en modo headless
+        browser = await p.chromium.launch(headless=True)
+        page = await browser.new_page()
 
-        browser.close()
-        return location, time_left, image_url, items
+        # Cargar la página
+        url = "https://www.whereisminerva.com"
+        await page.goto(url)
+
+        # Esperar que se cargue el contenido necesario
+        await page.wait_for_timeout(5000)  # Espera 5 segundos como en el código original
+
+        # Extraer la ubicación
+        location = await page.locator(".location-header").inner_text()
+
+        # Extraer el tiempo restante y convertirlo a segundos
+        time_left_str = await page.locator(".time-display").inner_text()
+        time_left = convert_time_to_seconds(time_left_str)
+
+        # Extraer la URL de la imagen de la ubicación
+        image_url = await page.locator(".location-image img").get_attribute('src')
+
+        # Extraer los artículos del inventario
+        inventory_items = []
+        items = await page.locator(".itemcard").all()
+
+        for item in items:
+            item_name = await item.locator(".itemname").inner_text()
+            item_price = await item.locator(".bullion").inner_text()
+            inventory_items.append({
+                'name': item_name,
+                'price': item_price.strip()
+            })
+
+        # Cerrar el navegador
+        await browser.close()
+
+        return location, time_left, image_url, inventory_items
 
 def convert_time_to_seconds(time_str):
     days = hours = minutes = seconds = 0
