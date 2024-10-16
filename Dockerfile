@@ -42,11 +42,15 @@ ENV CHROME_BIN=/usr/bin/google-chrome
 ENV CHROME_PATH=/usr/bin/google-chrome
 
 # Instalar ChromeDriver (necesario para Selenium)
+# Modificar el enlace a la versión más reciente de ChromeDriver
 RUN wget -N https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip \
     && unzip chromedriver_linux64.zip \
     && rm chromedriver_linux64.zip \
     && mv chromedriver /usr/local/bin/chromedriver \
     && chmod +x /usr/local/bin/chromedriver
+
+# Verificar que ChromeDriver esté instalado correctamente
+RUN chromedriver --version
 
 # Establecer el display en modo headless
 ENV DISPLAY=:99
