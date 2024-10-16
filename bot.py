@@ -9,6 +9,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options
 import discord
 from discord.ext import commands
 from googletrans import Translator
@@ -97,8 +98,13 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
         await message.delete()
 
 def scrape_minerva():
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
+    options = Options()
+    options.add_argument('--headless')  # Ejecutar en modo sin cabeza
+    options.add_argument('--no-sandbox')  # Para evitar problemas de permisos
+    options.add_argument('--disable-dev-shm-usage')  # Manejo de memoria
+    options.add_argument('--disable-gpu')  # Deshabilitar GPU si es necesario
+    options.add_argument('--window-size=1920,1080')  # Tamaño de ventana
+
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
     url = "https://www.whereisminerva.com"
