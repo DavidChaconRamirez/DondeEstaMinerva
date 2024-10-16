@@ -15,7 +15,7 @@ from googletrans import Translator
 # Configura el bot de Discord
 TOKEN = os.getenv('DISCORD_TOKEN')  # Usar variable de entorno
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))  # Usar variable de entorno
-MINERVA_USER_ID = os.getenv('MINERVA_USER_ID')
+ROLE_ID = os.getenv('ROLE_ID')
 intents = discord.Intents.default()
 intents.messages = True
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -40,7 +40,7 @@ async def send_to_discord(location, time_left, image_url, items):
     if place.endswith(" for"):
         place = place[:-3].strip()
 
-    final_message = f"¡Hola! <@{MINERVA_USER_ID}> {location_part} en {place}"
+    final_message = f"¡Hola! <@&{ROLE_ID}> {location_part} en {place}"
     location_message = await channel.send(final_message)
     sent_messages.append(location_message)
 
