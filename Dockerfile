@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     wget \
-    curl \  # Aquí se agrega curl
+    curl \
     unzip \
     xvfb \
     libxi6 \
@@ -32,7 +32,7 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     rm google-chrome-stable_current_amd64.deb
 
 # Descargar e instalar ChromeDriver
-RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
+RUN CHROMEDRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE) && \
     wget -N http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip -P /tmp && \
     unzip /tmp/chromedriver_linux64.zip -d /opt/chromedriver && \
     rm /tmp/chromedriver_linux64.zip && \
