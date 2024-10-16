@@ -156,7 +156,7 @@ def convert_time_to_seconds(time_str):
 
 @bot.event
 async def on_ready():
-    location, time_left, image_url, items = scrape_minerva()
+    location, time_left, image_url, items = await scrape_minerva()
     await send_to_discord(location, time_left, image_url, items)
 
 bot.run(TOKEN)
