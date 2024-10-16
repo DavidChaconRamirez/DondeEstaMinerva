@@ -78,16 +78,30 @@ async def send_to_discord(location, time_left, image_url, items):
 
 async def countdown(channel, time_left, countdown_message, sent_messages):
     while time_left > 0:
-        hours, remainder = divmod(time_left, 3600)
+        # Calcular días, horas, minutos y segundos
+        days, remainder = divmod(time_left, 86400)  # 86400 segundos en un día
+        hours, remainder = divmod(remainder, 3600)
         minutes, seconds = divmod(remainder, 60)
 
-        time_string = f"{hours:02}:{minutes:02}:{seconds:02}"
-        await countdown_message.edit(content=f"**Tiempo restante:** {time_string}")
+        # Formatear el tiempo
+        time_string = f"{days:02}d {hours:02}h {minutes:02}m {seconds:02}s"
+        
+        # Actualizar el mensaje de tiempo restante
+        await countdown_message.edit(content=f"**Tiempo restante:** {time_string}**")
+        
+        # Esperar un segundo
         await asyncio.sleep(1)
+        
+        # Disminuir el tiempo
         time_left -= 1
-
+        
+    # Eliminar todos los mensajes enviados
     for message in sent_messages:
         await message.delete()
+
+    # Reiniciar el proceso
+    await on_ready()
+
 
 def scrape_minerva():
     options = webdriver.ChromeOptions()
