@@ -92,12 +92,18 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
 def scrape_minerva():
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--window-size=1920x1080')
 
-    url = "https://www.whereisminerva.com"
-    driver.get(url)
-
+    driver = None
     try:
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+
+        url = "https://www.whereisminerva.com"
+        driver.get(url)
+
         wait = WebDriverWait(driver, 10)
         location = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".location-header"))).text
         time_left_str = driver.find_element(By.CSS_SELECTOR, ".time-display").text
@@ -114,10 +120,10 @@ def scrape_minerva():
     except Exception as e:
         print(f"Error durante el scraping: {e}")
     finally:
-        driver.quit()
+        if driver:
+            driver.quit()
 
     return location, time_left, image_url, inventory_items
-
 def convert_time_to_seconds(time_str):
     days = hours = minutes = seconds = 0
     time_parts = time_str.split()
