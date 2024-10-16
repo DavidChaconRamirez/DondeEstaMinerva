@@ -34,7 +34,7 @@ async def send_to_discord(location, time_left, image_url, items):
         location_part = location_part.replace("Ella", "").strip()
 
     if place.endswith(" in"):
-        place = place[:-3].strip()
+        place = place[:-2].strip()
 
     final_message = f"¡Hola! @Minerva {location_part} en {place}"
     location_message = await channel.send(final_message)
