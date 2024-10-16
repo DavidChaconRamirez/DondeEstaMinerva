@@ -51,12 +51,16 @@ RUN wget -N https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriv
 # Establecer el display en modo headless
 ENV DISPLAY=:99
 
+# Instalar Playwright y dependencias
+RUN pip install --upgrade pip \
+    && pip install playwright \
+    && playwright install
+
 # Copiar los archivos del bot al directorio de trabajo
 COPY . /app
 
 # Instalar las dependencias del bot
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Ejecutar el bot
 CMD ["python", "bot.py"]
