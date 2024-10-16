@@ -127,10 +127,16 @@ async def scrape_minerva():
 
         for item in items:
             item_name = await item.locator(".itemname").inner_text()
-            item_price = await item.locator(".bullion").inner_text()
+
+            # Usar nth(0) o all_inner_texts() según tu necesidad
+            item_prices = await item.locator(".bullion").all_inner_texts()
+            
+            # Si deseas tomar solo el primer precio:
+            item_price = item_prices[0].strip() if item_prices else "N/A"
+
             inventory_items.append({
                 'name': item_name,
-                'price': item_price.strip()
+                'price': item_price
             })
 
         # Cerrar el navegador
