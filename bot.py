@@ -15,6 +15,7 @@ from googletrans import Translator
 # Configura el bot de Discord
 TOKEN = os.getenv('DISCORD_TOKEN')  # Usar variable de entorno
 CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))  # Usar variable de entorno
+MINERVA_USER_ID = os.getenv('MINERVA_USER_ID')
 intents = discord.Intents.default()
 intents.messages = True
 bot = commands.Bot(command_prefix='!', intents=intents)
