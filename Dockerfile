@@ -1,11 +1,11 @@
-# Usa la imagen base de Python
+# Usar una imagen base de Python
 FROM python:3.11-slim
 
-# Instalar dependencias necesarias
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     wget \
+    curl \  # Aquí se agrega curl
     unzip \
-    curl \  # Aquí añadimos curl
     xvfb \
     libxi6 \
     libgconf-2-4 \
@@ -23,28 +23,29 @@ RUN apt-get update && apt-get install -y \
     libxss1 \
     libxtst6 \
     libappindicator3-1 \
-    fonts-liberation
+    fonts-liberation && \
+    rm -rf /var/lib/apt/lists/*
 
-# Instalar Google Chrome
+# Descargar e instalar Google Chrome
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
     dpkg -i google-chrome-stable_current_amd64.deb || apt-get -fy install && \
     rm google-chrome-stable_current_amd64.deb
 
-# Instalar ChromeDriver
+# Descargar e instalar ChromeDriver
 RUN CHROMEDRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` && \
     wget -N http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip -P /tmp && \
     unzip /tmp/chromedriver_linux64.zip -d /opt/chromedriver && \
     rm /tmp/chromedriver_linux64.zip && \
     ln -s /opt/chromedriver/chromedriver /usr/local/bin/chromedriver
 
-# Establecer directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /app
 
-# Copiar el resto del código
+# Copiar los archivos del proyecto
 COPY . /app
 
-# Instalar las dependencias de Python
-RUN pip install --no-cache-dir -r requirements.txt
+# Instalar las dependencias del proyecto
+RUN pip install -r requirements.txt
 
-# Comando de inicio
+# Comando para ejecutar el bot de Discord
 CMD ["python", "bot.py"]
