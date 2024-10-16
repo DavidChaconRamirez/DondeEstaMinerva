@@ -13,6 +13,7 @@ from selenium.webdriver.chrome.options import Options
 import discord
 from discord.ext import commands
 from googletrans import Translator
+from playwright.sync_api import sync_playwright
 import re
 
 # Configuración del bot
@@ -98,39 +99,18 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
         await message.delete()
 
 def scrape_minerva():
-    options = Options()
-    options.add_argument("--headless")  # Ejecución en modo headless
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+     with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto("URL_DE_LA_PAGINA")
+        
+        location = page.query_selector("SELECTOR_DE_LA_UBICACION").inner_text()
+        time_left = page.query_selector("SELECTOR_DEL_TIEMPO").inner_text()
+        image_url = page.query_selector("SELECTOR_DE_LA_IMAGEN").get_attribute("src")
+        items = page.query_selector("SELECTOR_DE_ITEMS").inner_text()
 
-    # Especificar la ruta de Chrome manualmente si es necesario
-    options.binary_location = "/usr/bin/google-chrome"  # Ruta donde Google Chrome está instalado en tu contenedor
-
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-
-    url = "https://www.whereisminerva.com"
-    driver.get(url)
-
-    try:
-        wait = WebDriverWait(driver, 10)
-        location = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".location-header"))).text
-        time_left_str = driver.find_element(By.CSS_SELECTOR, ".time-display").text
-        time_left = convert_time_to_seconds(time_left_str)
-        image_url = driver.find_element(By.CSS_SELECTOR, ".location-image img").get_attribute('src')
-
-        inventory_items = []
-        items = driver.find_elements(By.CSS_SELECTOR, ".itemcard")
-        for item in items:
-            item_name = item.find_element(By.CSS_SELECTOR, ".itemname").text
-            item_price = item.find_element(By.CSS_SELECTOR, ".bullion").text.strip()
-            inventory_items.append({'name': item_name, 'price': item_price})
-
-    except Exception as e:
-        print(f"Error durante el scraping: {e}")
-    finally:
-        driver.quit()
-
-    return location, time_left, image_url, inventory_items
+        browser.close()
+        return location, time_left, image_url, items
 
 def convert_time_to_seconds(time_str):
     days = hours = minutes = seconds = 0
