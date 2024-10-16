@@ -111,10 +111,13 @@ def convert_time_to_seconds(time_str):
 
     return (days * 86400) + (hours * 3600) + (minutes * 60) + seconds
 
-# Evento de inicio
 @bot.event
 async def on_ready():
-    location, time_left, image_url, items = await scrape_minerva()
-    await send_to_discord(location, time_left, image_url, items)
+    print(f'Bot conectado como {bot.user}')
+    try:
+        location, time_left, image_url, items = await scrape_minerva()
+        await send_to_discord(location, time_left, image_url, items)
+    except Exception as e:
+        print(f'Error en on_ready: {e}')
 
 bot.run(TOKEN)
