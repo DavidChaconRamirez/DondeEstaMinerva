@@ -40,6 +40,9 @@ async def send_to_discord(location, time_left, image_url, items):
     if place.endswith(" for"):
         place = place[:-3].strip()
 
+    if location_part.startswith("Ella"):
+        location_part = location_part.replace("Ella", "").strip()
+
     final_message = f"¡Hola! <@&{ROLE_ID}> {location_part} en {place}"
     location_message = await channel.send(final_message)
     sent_messages.append(location_message)
