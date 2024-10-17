@@ -30,6 +30,15 @@ async def choose_channel(ctx, channel: discord.TextChannel):
     channel_id = channel.id
     await ctx.send(f"Canal elegido: {channel.mention}")
 
+@choose_channel.error
+async def choose_channel_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send("Por favor, proporciona un canal válido.")
+    elif isinstance(error, commands.MissingPermissions):
+        await ctx.send("No tienes permisos para usar este comando.")
+    else:
+        await ctx.send(f"Ocurrió un error: {str(error)}")
+
 async def send_to_discord(location, time_left, image_url, items):
     await bot.wait_until_ready()  # Esperar hasta que el bot esté listo
 
@@ -42,7 +51,6 @@ async def send_to_discord(location, time_left, image_url, items):
 
     channel = bot.get_channel(channel_id)
     if channel is None:
-        # Enviar un mensaje a un canal por defecto si el canal no existe
         await bot.get_channel(channel_id).send(f"El canal con ID {channel_id} no se encontró.")
         return  # Salir si el canal no existe
 
