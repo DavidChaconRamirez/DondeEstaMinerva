@@ -104,7 +104,7 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
         await countdown_message.edit(content=f"**Tiempo restante:** {time_string}**")
         
         # Esperar 1 segundo antes de actualizar nuevamente
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.7)
 
     # Eliminar todos los mensajes enviados cuando termine el conteo
     for message in sent_messages:
