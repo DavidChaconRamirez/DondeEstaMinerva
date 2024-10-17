@@ -34,12 +34,14 @@ async def send_to_discord(location, time_left, image_url, items):
     await bot.wait_until_ready()  # Esperar hasta que el bot esté listo
 
     if channel_id is None:
-        print("El canal no ha sido elegido. Usa !elige <canal> para seleccionar uno.")
+        # Enviar un mensaje al canal donde se ejecutó el comando
+        await bot.get_channel(ctx.channel.id).send("El canal no ha sido elegido. Usa !elige <canal> para seleccionar uno.")
         return  # Salir si el canal no está configurado
 
     channel = bot.get_channel(channel_id)
     if channel is None:
-        print(f"El canal con ID {channel_id} no se encontró.")
+        # Enviar un mensaje al canal donde se ejecutó el comando
+        await ctx.send(f"El canal con ID {channel_id} no se encontró.")
         return  # Salir si el canal no existe
 
     sent_messages = []
@@ -191,4 +193,3 @@ async def on_ready():
     await send_to_discord(location, time_left, image_url, items)
 
 bot.run(TOKEN)
-
