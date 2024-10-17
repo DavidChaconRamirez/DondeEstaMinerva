@@ -43,10 +43,10 @@ async def choose_channel_error(ctx, error):
         await ctx.send(f"Ocurrió un error: {str(error)}")
         print(f"Error inesperado: {str(error)}")  # Log de depuración
 
-@bot.command(name='hello')
-async def hello_world(ctx):
-    await ctx.send("Hello, World!")  # Responder con "Hello, World!"
-    print("Comando !hello ejecutado.")  # Log de depuración
+@bot.command()
+async def hello(ctx):
+    print("¡Comando 'hello' recibido!")
+    await ctx.send("Hello World!")
 
 async def send_to_discord(location, time_left, image_url, items):
     await bot.wait_until_ready()  # Esperar hasta que el bot esté listo
