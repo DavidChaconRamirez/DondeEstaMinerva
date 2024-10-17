@@ -206,6 +206,12 @@ def convert_time_to_seconds(time_str):
 @bot.event
 async def on_ready():
     print(f'{bot.user} ha iniciado sesión en Discord!')
+
+    # Intenta enviar un mensaje de prueba al canal predeterminado
+    if channel_id is not None:
+        channel = bot.get_channel(channel_id)
+        if channel:
+            await channel.send("Bot está en línea y listo para recibir comandos.")
     location, time_left, image_url, items = scrape_minerva()
     await send_to_discord(location, time_left, image_url, items)
 
