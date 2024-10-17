@@ -14,16 +14,35 @@ from googletrans import Translator
 
 # Configura el bot de Discord
 TOKEN = os.getenv('DISCORD_TOKEN')  # Usar variable de entorno
-CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))  # Usar variable de entorno
 ROLE_ID = os.getenv('ROLE_ID')
 intents = discord.Intents.default()
 intents.messages = True
+intents.guilds = True  # Necesario para escuchar eventos de guilds
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-async def send_to_discord(location, time_left, image_url, items):
-    channel = bot.get_channel(CHANNEL_ID)
-    sent_messages = []
+# Almacenar el ID del canal
+channel_id = None
 
+@bot.command(name='elige')
+@commands.has_permissions(administrator=True)
+async def choose_channel(ctx, channel: discord.TextChannel):
+    global channel_id
+    channel_id = channel.id
+    await ctx.send(f"Canal elegido: {channel.mention}")
+
+async def send_to_discord(location, time_left, image_url, items):
+    await bot.wait_until_ready()  # Esperar hasta que el bot esté listo
+
+    if channel_id is None:
+        print("El canal no ha sido elegido. Usa !elige <canal> para seleccionar uno.")
+        return  # Salir si el canal no está configurado
+
+    channel = bot.get_channel(channel_id)
+    if channel is None:
+        print(f"El canal con ID {channel_id} no se encontró.")
+        return  # Salir si el canal no existe
+
+    sent_messages = []
     translator = Translator()
     translated_location = translator.translate(location, src='en', dest='es')
 
@@ -36,7 +55,7 @@ async def send_to_discord(location, time_left, image_url, items):
     if place.endswith(" in"):
         place = place[:-3].strip()
 
-    # Si el lugar contiene un " in" al final, lo eliminamos
+    # Si el lugar contiene un " for" al final, lo eliminamos
     if place.endswith(" for"):
         place = place[:-3].strip()
 
@@ -113,7 +132,6 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
     # Reiniciar el proceso
     await on_ready()
 
-
 def scrape_minerva():
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
@@ -149,6 +167,7 @@ def scrape_minerva():
             driver.quit()
 
     return location, time_left, image_url, inventory_items
+
 def convert_time_to_seconds(time_str):
     days = hours = minutes = seconds = 0
     time_parts = time_str.split()
@@ -172,3 +191,4 @@ async def on_ready():
     await send_to_discord(location, time_left, image_url, items)
 
 bot.run(TOKEN)
+
