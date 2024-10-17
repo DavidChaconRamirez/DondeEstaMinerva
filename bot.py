@@ -14,54 +14,16 @@ from googletrans import Translator
 
 # Configura el bot de Discord
 TOKEN = os.getenv('DISCORD_TOKEN')  # Usar variable de entorno
+CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))  # Usar variable de entorno
 ROLE_ID = os.getenv('ROLE_ID')
 intents = discord.Intents.default()
 intents.messages = True
-intents.guilds = True  # Necesario para escuchar eventos de guilds
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Almacenar el ID del canal
-channel_id = None
-
-@bot.command(name='elige')
-@commands.has_permissions(administrator=True)
-async def choose_channel(ctx, channel: discord.TextChannel):
-    global channel_id
-    channel_id = channel.id
-    await ctx.send(f"Canal elegido: {channel.mention}")
-    print(f"Canal elegido: {channel.mention}")  # Log de depuración
-
-@choose_channel.error
-async def choose_channel_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
-        await ctx.send("Por favor, proporciona un canal válido.")
-        print("Error: canal no válido.")  # Log de depuración
-    elif isinstance(error, commands.MissingPermissions):
-        await ctx.send("No tienes permisos para usar este comando.")
-        print("Error: permisos insuficientes.")  # Log de depuración
-    else:
-        await ctx.send(f"Ocurrió un error: {str(error)}")
-        print(f"Error inesperado: {str(error)}")  # Log de depuración
-
-@bot.command()
-async def hello(ctx):
-    print("¡Comando 'hello' recibido!")
-    await ctx.send("Hello World!")
-
 async def send_to_discord(location, time_left, image_url, items):
-    await bot.wait_until_ready()  # Esperar hasta que el bot esté listo
-    print("Enviando a Discord...")  # Log de depuración
-
-    if channel_id is None:
-        print("El canal no ha sido elegido.")  # Log de depuración
-        return  # Salir si el canal no está configurado
-
-    channel = bot.get_channel(channel_id)
-    if channel is None:
-        print(f"El canal con ID {channel_id} no se encontró.")  # Log de depuración
-        return  # Salir si el canal no existe
-
+    channel = bot.get_channel(CHANNEL_ID)
     sent_messages = []
+
     translator = Translator()
     translated_location = translator.translate(location, src='en', dest='es')
 
@@ -138,11 +100,12 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
         # Formatear el tiempo
         time_string = f"{int(days):02}d {int(hours):02}h {int(minutes):02}m {int(seconds):02}s"
         
-        # Actualizar el mensaje de tiempo restante
-        await countdown_message.edit(content=f"**Tiempo restante:** {time_string}**")
+        # Actualizar el mensaje de tiempo restante en Discord con un intervalo más lento
+        if int(time_left) % 10 == 0:  # Actualiza cada 10 segundos
+            await countdown_message.edit(content=f"**Tiempo restante:** {time_string}**")
         
-        # Esperar 1 segundo antes de actualizar nuevamente
-        await asyncio.sleep(0.7)
+        # Esperar 1 segundo antes de la próxima iteración
+        await asyncio.sleep(1)
 
     # Eliminar todos los mensajes enviados cuando termine el conteo
     for message in sent_messages:
@@ -206,13 +169,12 @@ def convert_time_to_seconds(time_str):
 @bot.event
 async def on_ready():
     print(f'{bot.user} ha iniciado sesión en Discord!')
-
-    # Intenta enviar un mensaje de prueba al canal predeterminado
-    if channel_id is not None:
-        channel = bot.get_channel(channel_id)
-        if channel:
-            await channel.send("Bot está en línea y listo para recibir comandos.")
-    location, time_left, image_url, items = scrape_minerva()
-    await send_to_discord(location, time_left, image_url, items)
+    while True:
+        try:
+            location, time_left, image_url, items = scrape_minerva()
+            await send_to_discord(location, time_left, image_url, items)
+        except Exception as e:
+            print(f"Error al enviar datos a Discord: {e}")
+        await asyncio.sleep(300)  # Esperar 5 minutos antes de intentar de nuevo
 
 bot.run(TOKEN)
