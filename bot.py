@@ -29,29 +29,36 @@ async def choose_channel(ctx, channel: discord.TextChannel):
     global channel_id
     channel_id = channel.id
     await ctx.send(f"Canal elegido: {channel.mention}")
+    print(f"Canal elegido: {channel.mention}")  # Log de depuración
 
 @choose_channel.error
 async def choose_channel_error(ctx, error):
     if isinstance(error, commands.BadArgument):
         await ctx.send("Por favor, proporciona un canal válido.")
+        print("Error: canal no válido.")  # Log de depuración
     elif isinstance(error, commands.MissingPermissions):
         await ctx.send("No tienes permisos para usar este comando.")
+        print("Error: permisos insuficientes.")  # Log de depuración
     else:
         await ctx.send(f"Ocurrió un error: {str(error)}")
+        print(f"Error inesperado: {str(error)}")  # Log de depuración
+
+@bot.command(name='hello')
+async def hello_world(ctx):
+    await ctx.send("Hello, World!")  # Responder con "Hello, World!"
+    print("Comando !hello ejecutado.")  # Log de depuración
 
 async def send_to_discord(location, time_left, image_url, items):
     await bot.wait_until_ready()  # Esperar hasta que el bot esté listo
+    print("Enviando a Discord...")  # Log de depuración
 
     if channel_id is None:
-        # Enviar un mensaje al canal por defecto si no se ha elegido
-        default_channel = bot.get_channel(channel_id)
-        if default_channel:
-            await default_channel.send("El canal no ha sido elegido. Usa !elige <canal> para seleccionar uno.")
+        print("El canal no ha sido elegido.")  # Log de depuración
         return  # Salir si el canal no está configurado
 
     channel = bot.get_channel(channel_id)
     if channel is None:
-        await bot.get_channel(channel_id).send(f"El canal con ID {channel_id} no se encontró.")
+        print(f"El canal con ID {channel_id} no se encontró.")  # Log de depuración
         return  # Salir si el canal no existe
 
     sent_messages = []
