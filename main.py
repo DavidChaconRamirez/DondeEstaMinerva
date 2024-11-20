@@ -93,6 +93,14 @@ async def countdown(channel, time_left, countdown_message, sent_messages):
     for message in sent_messages:
         await message.delete()
 
+async def clear_channel_messages(channel):
+    """Elimina todos los mensajes en un canal."""
+    try:
+        async for message in channel.history(limit=None):
+            await message.delete()
+    except Exception as e:
+        print(f"Error al intentar eliminar los mensajes: {e}")
+
 def scrape_minerva():
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
@@ -140,7 +148,17 @@ def convert_time_to_seconds(time_str):
 
 @bot.event
 async def on_ready():
+    print(f"{bot.user.name} está listo y conectado.")
+    
+    # Obtén el canal por ID
+    channel = bot.get_channel(int(CHANNEL_ID))
+    
+    # Borra todos los mensajes en el canal
+    await clear_channel_messages(channel)
+    
+    # Realiza el scraping y envía los nuevos mensajes
     location, time_left, image_url, items = scrape_minerva()
     await send_to_discord(location, time_left, image_url, items)
 
 bot.run(TOKEN)
+
